@@ -16,6 +16,7 @@ const (
 	Comma               = ','
 )
 
+// TokenTypes
 const (
 	LeftBraceIdentifier = iota
 	RightBraceIdentifier
@@ -24,9 +25,10 @@ const (
 	DescriptionDeclaration
 )
 
+// Modifiers
 const (
 	UrgencyModifier = iota
-	tagModifier
+	TagModifier
 )
 
 type Token struct {

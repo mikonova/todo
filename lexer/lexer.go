@@ -13,6 +13,8 @@ import (
 	"todo/lexer/tokens"
 )
 
+const StorageFileName = "todos.md"
+
 type TokenStorage struct {
 	TokenStream []string
 	FileName    string
@@ -26,14 +28,22 @@ homedir path starts with '~' (a tilda), root (absolute path) starts with "/" (sl
 In Windows, full path starts with a drive letter
 */
 func OpenFiles(folder string, ext string) ([]*os.File, error) {
-	filelist := make([]*os.File, 0)
+	if err := os.Chdir(folder); err != nil {
+		log.Fatalln(errdef.ErrBase + "Cannot change into user directory")
+	}
+	if file, err := os.Create(StorageFileName); err != nil {
+		log.Fatalln(errdef.ErrBase + "Cannot create the summary file")
+	} else {
+		file.Close()
+	}
+	fileList := make([]*os.File, 0)
 	folderSep := ([]rune(folder))[0]
 
 	if folderSep == '~' {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
 			err = errors.New(errdef.ErrBase + "cannot find user home dir")
-			return filelist, err
+			return fileList, err
 		}
 		folder = homeDir + folder[1:]
 	}
@@ -50,15 +60,15 @@ func OpenFiles(folder string, ext string) ([]*os.File, error) {
 			fmt.Print(errdef.WarnBase + "unable to open file: " + path)
 		}
 		if filepath.Ext(path) == ext {
-			filelist = append(filelist, file)
+			fileList = append(fileList, file)
 		}
 		return nil
 	})
 	if err != nil {
 		err = errors.New(errdef.ErrBase + "error in walking the named dir")
-		return filelist, err
+		return fileList, err
 	}
-	return filelist, nil
+	return fileList, nil
 }
 
 /*
@@ -110,7 +120,7 @@ func tokenize(line string, depth int) ([]string, int) {
 		if lineToRunes[0] == tokens.Star && lineToRunes[1] == tokens.LineStart {
 			depth -= 1
 		}
-		if char != tokens.Space {
+		if !(char == tokens.Space || char == tokens.Comma) {
 			buf += string(char)
 		}
 		if char == tokens.Space {
