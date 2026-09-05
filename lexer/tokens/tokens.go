@@ -18,10 +18,13 @@ const (
 
 // TokenTypes
 const (
-	LeftBraceIdentifier = iota
+	LineStartDeclaration = iota
+	MultilineDeclaration
+	MultilineUndeclaration
+	LeftBraceIdentifier
 	RightBraceIdentifier
 	ToDoDeclaration
-	Modifier
+	ModifierDeclaration
 	DescriptionDeclaration
 )
 
@@ -29,6 +32,7 @@ const (
 const (
 	UrgencyModifier = iota
 	TagModifier
+	SubModifier
 )
 
 type Token struct {
